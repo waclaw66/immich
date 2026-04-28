@@ -15,6 +15,7 @@ import { EnvSchema } from 'src/dtos/env.dto';
 import {
   DatabaseExtension,
   ImmichEnvironment,
+  ImmichHeader,
   ImmichTelemetry,
   ImmichWorker,
   LogFormat,
@@ -300,11 +301,9 @@ const getEnv = (): EnvData => {
           mount: true,
           generateId: true,
           setup: (cls, req: Request, res: Response) => {
-            const headerValues = req.headers['x-correlation-id'];
-            const headerValue = Array.isArray(headerValues) ? headerValues[0] : headerValues;
-            const cid = headerValue || cls.get(CLS_ID);
+            const cid = req.header(ImmichHeader.CorrelationId) || cls.get(CLS_ID);
             cls.set(CLS_ID, cid);
-            res.header('X-Correlation-ID', cid);
+            res.header(ImmichHeader.CorrelationId, cid);
           },
         },
       },
